@@ -2,6 +2,7 @@ import { compare } from "https://deno.land/x/bcrypt@v0.4.0/mod.ts";
 import { renderFile } from 'https://deno.land/x/mustache@v0.3.0/mod.ts';
 import { router } from "https://crux.land/router@0.0.12";
 import { serve } from "https://deno.land/std@0.146.0/http/server.ts";
+import { StorageObject } from "./bunnycdn.d.ts";
 
 import "https://deno.land/std@0.146.0/dotenv/load.ts";
 
@@ -11,7 +12,7 @@ const handler = router({
 });
 
 async function get(req: Request): Promise<Response> {
-    let path = new URL(req.url).pathname;
+    const path = new URL(req.url).pathname;
 
     if (!path.endsWith("/")) {
         return fetch(`https://${Deno.env.get("BUNNY_CDN") + path}`);
@@ -19,7 +20,7 @@ async function get(req: Request): Promise<Response> {
 
     const headers = new Headers(req.headers);
     headers.delete("Referer");
-    headers.append("AccessKey", Deno.env.get("BUNNY_KEY"));
+    headers.append("AccessKey", Deno.env.get("BUNNY_KEY") || "");
 
     const resp = await fetch(`https://${Deno.env.get("BUNNY_ENDPOINT")}/${Deno.env.get("BUNNY_ZONE") + path}`, { method: 'GET', headers });
 
@@ -34,14 +35,14 @@ async function put(req: Request): Promise<Response> {
     }
 
     const headers = new Headers(req.headers);
-    headers.append("AccessKey", Deno.env.get("BUNNY_KEY"));
+    headers.append("AccessKey", Deno.env.get("BUNNY_KEY") || "");
 
     const url = `https://${Deno.env.get("BUNNY_ENDPOINT")}/${Deno.env.get("BUNNY_ZONE") + new URL(req.url).pathname}`;
 
     return fetch(url, { method: 'PUT', headers, body: req.body });
 }
 
-async function index(json: any, path: string): Promise<Response> {
+async function index(json: StorageObject[], path: string): Promise<Response> {
     const directories = json.filter(obj => obj.IsDirectory);
     const files = json.filter(obj => !obj.IsDirectory);
 
@@ -58,7 +59,7 @@ async function auth(headers: Headers): Promise<boolean> {
 
     const [username, password] = atob(authorization.slice(6)).split(":");
 
-    return username == Deno.env.get("USERNAME") && await compare(password, Deno.env.get("HASH"));
+    return username == Deno.env.get("USERNAME") && await compare(password, Deno.env.get("HASH") || "");
 }
 
 await serve(handler);
