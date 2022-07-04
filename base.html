@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>{{title}}</title>
+    <style>
+        body {
+            font-family: sans-serif;
+        }
+    </style>
+</head>
+<body>
+    {{#root}}
+        <h1>{{title}}</h1>
+    {{/root}}
+    {{^root}}
+        <h1>{{path}}</h1>
+        <p><a href="../">../</a></p>
+    {{/root}}
+
+    {{#directories}}
+        <p><a href="{{ObjectName}}/">{{ObjectName}}/</a></p>
+    {{/directories}}
+    {{#files}}
+        <p><a href="{{ObjectName}}">{{ObjectName}}</a></p>
+    {{/files}}
+</body>
+</html>
