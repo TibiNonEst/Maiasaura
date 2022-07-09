@@ -20,7 +20,7 @@ in the future.
 | `BUNNY_CDN`      | The endpoint of your cache pull zone. This is probably `<zone>.b-cdn.net`                |
 | `TITLE`          | The title of your site. This will be in the `title` meta tag as well as on the home page |
 | `USERNAME`       | The username to use for maven artifact uploading                                         |
-| `HASH`           | A BCrypt-hashed password to use for maven artifact uploading                             |
+| `HASH`           | A SCrypt-hashed password to use for maven artifact uploading                             |
 
 ## TODO
 - Purge files from cache on put
