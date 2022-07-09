@@ -1,4 +1,4 @@
-import { compare } from "https://deno.land/x/bcrypt@v0.4.0/mod.ts";
+import { verify } from "https://deno.land/x/scrypt@v4.0.0/mod.ts";
 import { renderFile } from 'https://deno.land/x/mustache@v0.3.0/mod.ts';
 import { router } from "https://crux.land/router@0.0.12";
 import { serve } from "https://deno.land/std@0.146.0/http/server.ts";
@@ -51,7 +51,7 @@ async function index(json: StorageObject[], path: string): Promise<Response> {
     return new Response(await renderFile("base.html", data), { headers: { "content-type": "text/html" }});
 }
 
-async function auth(headers: Headers): Promise<boolean> {
+function auth(headers: Headers): boolean {
     const authorization = headers.get("Authorization");
     if (!authorization || !authorization.startsWith("Basic")) {
         return false;
@@ -59,7 +59,7 @@ async function auth(headers: Headers): Promise<boolean> {
 
     const [username, password] = atob(authorization.slice(6)).split(":");
 
-    return username == Deno.env.get("USERNAME") && await compare(password, Deno.env.get("HASH") || "");
+    return username == Deno.env.get("USERNAME") && verify(password, Deno.env.get("HASH") || "");
 }
 
 await serve(handler);
